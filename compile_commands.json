@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/dragon/Containers/Lang/mini-rust/build",
+  "command": "clang++  -I/home/dragon/Containers/Lang/mini-rust/include  -Wall -Wextra -std=gnu++20 -o CMakeFiles/lang.dir/src/main.cpp.o -c /home/dragon/Containers/Lang/mini-rust/src/main.cpp",
+  "file": "/home/dragon/Containers/Lang/mini-rust/src/main.cpp",
+  "output": "CMakeFiles/lang.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/dragon/Containers/Lang/mini-rust/build",
+  "command": "clang++  -I/home/dragon/Containers/Lang/mini-rust/include  -Wall -Wextra -std=gnu++20 -o CMakeFiles/lang.dir/src/parsing_tree.cpp.o -c /home/dragon/Containers/Lang/mini-rust/src/parsing_tree.cpp",
+  "file": "/home/dragon/Containers/Lang/mini-rust/src/parsing_tree.cpp",
+  "output": "CMakeFiles/lang.dir/src/parsing_tree.cpp.o"
+},
+{
+  "directory": "/home/dragon/Containers/Lang/mini-rust/build",
+  "command": "clang++  -I/home/dragon/Containers/Lang/mini-rust/include  -Wall -Wextra -std=gnu++20 -o CMakeFiles/lang.dir/src/typechecker.cpp.o -c /home/dragon/Containers/Lang/mini-rust/src/typechecker.cpp",
+  "file": "/home/dragon/Containers/Lang/mini-rust/src/typechecker.cpp",
+  "output": "CMakeFiles/lang.dir/src/typechecker.cpp.o"
+}
+]
