@@ -17,5 +17,6 @@ include_directories(
 
 add_executable(lang src/main.cpp
                     src/parsing_tree.cpp
+                    src/types.cpp
                     src/type_check.cpp
                     src/mode_check.cpp)
