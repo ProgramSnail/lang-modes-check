@@ -5,11 +5,11 @@ namespace mode_check {
 void check_const(const nodes::Const &, State &) {}
 
 void check_var(const nodes::Var &expr, State &state) {
-  if (not expr.mode.has_value()) {
-    utils::throw_error("NO_MODE for " + expr.name);
+  if (not expr.type.has_value()) {
+    utils::throw_error("NO_TYPE for " + expr.name);
     return;
   }
-  auto mode = expr.mode.value();
+  auto mode = expr.type.value().get().mode;
 
   if (auto maybe_var_state = state.get_var_state(expr.name);
       maybe_var_state.has_value()) {
@@ -27,32 +27,27 @@ void check_var(const nodes::Var &expr, State &state) {
 }
 
 void check_let(const nodes::Let &expr, State &state) {
-  {
-    Context context(state);
-    check_expr(expr.body, state);
+  Context context(state);
+
+  check_expr(expr.body, state);
+
+  if (not expr.name.type.has_value()) {
+    utils::throw_error("NO_VAR_TYPE for " + expr.name.name);
   }
+  state.add_var(expr.name.name, expr.name.type.value().get().mode);
 
-  {
-    Context context(state);
-
-    if (not expr.name.mode.has_value()) {
-      utils::throw_error("NO_VAR_MODE");
-    }
-    state.add_var(expr.name.name, expr.name.mode.value());
-
-    check_expr(expr.where, state);
-  }
+  check_expr(expr.where, state);
 }
 
 void check_lambda(const nodes::Lambda &expr, State &state) {
   Context context(state);
 
   for (const auto &arg : expr.args) {
-    if (not arg.mode.has_value()) {
-      utils::throw_error("NO_VAR_MODE");
+    if (not arg.type.has_value()) {
+      utils::throw_error("NO_VAR_TYPE for " + arg.name);
       continue;
     }
-    state.add_var(arg.name, arg.mode.value());
+    state.add_var(arg.name, arg.type.value().get().mode);
   }
 
   check_expr(expr.expr, state);

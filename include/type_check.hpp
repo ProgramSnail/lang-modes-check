@@ -29,7 +29,7 @@ struct VarManager {
       return var_it->second;
     }
 
-    utils::throw_error("NO_VAR");
+    utils::throw_error("NO_VAR for " + name);
     return std::nullopt;
   }
 

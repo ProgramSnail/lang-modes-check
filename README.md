@@ -19,7 +19,7 @@ https://blog.janestreet.com/oxidizing-ocaml-ownership/
 - *local* check
 - *once* check
 - *separated* check
-- type check (optional)
+- type check +
 
 ## Examples
 

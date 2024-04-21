@@ -17,14 +17,16 @@ types::TypeID check_var(nodes::Var &expr, State &state) {
 types::TypeID check_let(nodes::Let &expr, State &state) {
   Context context(state.manager);
 
-  types::TypeID new_type = state.type_storage.introduce_new_generic();
-
+  types::TypeID new_type =
+      state.type_storage.introduce_new_generic(expr.name.name, expr.name.mode_hint);
+  expr.name.type = new_type;
   state.manager.add_var(expr.name.name, new_type);
 
   types::TypeID body_type = check_expr(expr.body, state);
 
-  if (not state.type_storage.unify(new_type, body_type)) {
-    utils::throw_error("DIFFERENT_TYPES");
+  if (not state.type_storage.unify(new_type, body_type,
+                                   UnifyModePolicy::CheckLeftIsSubmode)) {
+    utils::throw_error("DIFFERENT_TYPES_OR_MODES");
   }
 
   types::TypeID where_type = check_expr(expr.where, state);
@@ -34,8 +36,9 @@ types::TypeID check_let(nodes::Let &expr, State &state) {
 types::TypeID check_lambda(nodes::Lambda &expr, State &state) {
   Context context(state.manager);
 
-  for (const auto &arg : expr.args) {
-    types::TypeID new_type = state.type_storage.introduce_new_generic();
+  for (auto &arg : expr.args) {
+    types::TypeID new_type = state.type_storage.introduce_new_generic(arg.name, arg.mode_hint);
+    arg.type = new_type;
     state.manager.add_var(arg.name, new_type);
   }
 
@@ -55,8 +58,9 @@ types::TypeID check_call(nodes::Call &expr, State &state) {
 
     for (size_t i = 0; i < expr.args.size(); ++i) {
       types::TypeID arg_type = check_expr(expr.args[i], state);
-      if (not state.type_storage.unify(arrow_func_type->types[i], arg_type)) {
-        utils::throw_error("DIFFERENT_TYPES");
+      if (not state.type_storage.unify(arrow_func_type->types[i], arg_type,
+                                       UnifyModePolicy::CheckLeftIsSubmode)) {
+        utils::throw_error("DIFFERENT_TYPES_OR_MODES");
       }
     }
 
@@ -71,14 +75,16 @@ types::TypeID check_condition(nodes::Condition &expr, State &state) {
   types::TypeID condition_type = check_expr(expr.condition, state);
 
   if (not state.type_storage.unify(condition_type,
-                                   state.type_storage.get_bool_type())) {
+                                   state.type_storage.get_bool_type(),
+                                   UnifyModePolicy::Ignore)) {
     utils::throw_error("DIFFERENT_TYPES");
   }
 
   types::TypeID then_type = check_expr(expr.then_case, state);
   types::TypeID else_type = check_expr(expr.else_case, state);
 
-  if (not state.type_storage.unify(then_type, else_type)) {
+  if (not state.type_storage.unify(then_type, else_type,
+                                   UnifyModePolicy::ApplyStrongest)) {
     utils::throw_error("DIFFERENT_TYPES");
   }
 

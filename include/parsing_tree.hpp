@@ -15,7 +15,6 @@ using namespace std;
 
 struct NodeInfo {
   optional<types::TypeID> type = std::nullopt;
-  optional<types::Mode> mode = std::nullopt;
 };
 
 struct Expr;
@@ -23,9 +22,11 @@ using ExprPtr = shared_ptr<Expr>;
 using ExprPtrV = std::vector<ExprPtr>;
 
 struct Arg : public NodeInfo {
-  Arg(string name) : name(std::move(name)) {}
+  Arg(string name, types::Mode mode_hint = {}) : name(std::move(name)), mode_hint(mode_hint) {}
 
   string name;
+
+  types::Mode mode_hint;
 };
 
 struct Const : public NodeInfo {
@@ -92,17 +93,13 @@ template <typename T> inline T with_type(T node, types::Type type) {
   return node;
 }
 
-template <typename T> inline T with_mode(T node, types::Mode mode) {
-  node.mode = std::move(mode);
-  return node;
+inline Arg with_mode_hint(Arg arg, types::Mode mode) {
+  arg.mode_hint = mode;
+  return arg;
 }
 
-template <typename T> inline T with_unique(T node) {
-  return with_mode(node, types::Mode(types::Mode::Uniq::UNIQUE));
-}
-
-inline ExprPtr make_var(std::string name, types::Mode mode = types::Mode()) {
-  return make_expr<Var>(with_mode(Var(std::move(name)), mode));
+inline Arg with_unique_hint(Arg arg) {
+  return with_mode_hint(std::move(arg), types::Mode(types::Mode::Uniq::UNIQUE));
 }
 
 inline ExprPtr lambda1(string var, ExprPtr expr) {
@@ -113,9 +110,8 @@ inline ExprPtr lambda1(Arg var, ExprPtr expr) {
   return make_expr<Lambda>(vector<Arg>{var}, std::move(expr));
 }
 
-inline ExprPtr operator_call(string name, ExprPtr left, ExprPtr right,
-                             types::Mode mode = types::Mode()) {
-  return make_expr<Call>(make_var(name, mode), ExprPtrV{left, right});
+inline ExprPtr operator_call(string name, ExprPtr left, ExprPtr right) {
+  return make_expr<Call>(make_expr<Var>(name), ExprPtrV{left, right});
 }
 
 // TODO: all constructors
