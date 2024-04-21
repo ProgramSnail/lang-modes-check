@@ -36,13 +36,20 @@ types::TypeID check_let(nodes::Let &expr, State &state) {
 types::TypeID check_lambda(nodes::Lambda &expr, State &state) {
   Context context(state.manager);
 
+  ArrowType lambda_arrow_type;
+
+    lambda_arrow_type.types.reserve(expr.args.size() + 1);
   for (auto &arg : expr.args) {
     types::TypeID new_type = state.type_storage.introduce_new_generic(arg.name, arg.mode_hint);
     arg.type = new_type;
+    lambda_arrow_type.types.push_back(new_type);
     state.manager.add_var(arg.name, new_type);
   }
 
-  types::TypeID lambda_type = check_expr(expr.expr, state);
+  types::TypeID ret_type = check_expr(expr.expr, state);
+  lambda_arrow_type.types.push_back(ret_type);
+
+  types::TypeID lambda_type = state.type_storage.add(lambda_arrow_type);
   return (expr.type = lambda_type).value();
 }
 

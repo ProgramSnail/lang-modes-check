@@ -231,7 +231,7 @@ struct Storage {
     }
   }
 
-private:
+// private: // TODO: temporary, to beautify type checker output
   size_t first_unused_generic_id = 0;
 
   vector<Type> types;
