@@ -1,13 +1,14 @@
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <string>
 #include <variant>
 #include <vector>
 
-#include "utils.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 namespace nodes {
 
@@ -22,10 +23,10 @@ using ExprPtr = shared_ptr<Expr>;
 using ExprPtrV = std::vector<ExprPtr>;
 
 struct Arg : public NodeInfo {
-  Arg(string name, types::Mode mode_hint = {}) : name(std::move(name)), mode_hint(mode_hint) {}
+  Arg(string name, types::Mode mode_hint = {})
+      : name(std::move(name)), mode_hint(mode_hint) {}
 
   string name;
-
   types::Mode mode_hint;
 };
 
@@ -108,6 +109,10 @@ inline ExprPtr lambda1(string var, ExprPtr expr) {
 
 inline ExprPtr lambda1(Arg var, ExprPtr expr) {
   return make_expr<Lambda>(vector<Arg>{var}, std::move(expr));
+}
+
+inline ExprPtr lambda2(Arg var1, Arg var2, ExprPtr expr) {
+  return make_expr<Lambda>(vector<Arg>{var1, var2}, std::move(expr));
 }
 
 inline ExprPtr operator_call(string name, ExprPtr left, ExprPtr right) {
